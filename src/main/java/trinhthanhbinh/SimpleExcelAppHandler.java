@@ -44,12 +44,11 @@ public class SimpleExcelAppHandler {
 			String mathContent = mathCell.getContent();
 			String[] tokens = generateTokens(mathContent, normalCellMap);
 			if(tokens.length == 0) {
-				System.err.println("---> " + mathCell.getName() + " NOT exited");
+				this.getErrors().add("The " + mathCell.getName() + " not content value");
 				return cell;
 			}
 			
 			int realValue = evaluateRPN(tokens);
-			System.out.println("===> value: " + realValue);
 			cell = new TikiCell(mathCell.getName(), String.valueOf(realValue));			
 		} catch (ArithmeticException e) {
 			this.getErrors().add("ArithmeticException: / by zero");
@@ -87,6 +86,7 @@ public class SimpleExcelAppHandler {
 		Stack<String> stack = new Stack<String>();
 
 		for (String token : tokens) {
+			if(token != null && token.isEmpty()) continue;
 			if (!operators.contains(token)) {
 				stack.push(token);
 			} else {
@@ -185,6 +185,10 @@ public class SimpleExcelAppHandler {
 
 		if(result != null && !result.isEmpty()) this.getErrors().add(result);
 		return result;
+	}
+
+	public void preProcess(Map<String, String> mathCellMap) {
+		findCircularDependencies(mathCellMap);
 	}
 	
 

@@ -53,7 +53,11 @@ public class TikiMainApp {
 
 //        bufferedWriter.close();
         
-        String findCircularDependencies = cellHandler.findCircularDependencies(mathCellMap);
+//        String findCircularDependencies = cellHandler.findCircularDependencies(mathCellMap);
+        /*
+         * Pre process cells to detect errors
+         */
+        cellHandler.preProcess(mathCellMap);
         
         System.out.println("Output: \n");
         System.out.println("---------------------------------------");
@@ -66,17 +70,14 @@ public class TikiMainApp {
 				System.out.println(errorMsg);
 			}
         } else {
-        	System.out.println("---- Normal Cell Map");
             // For normal cell which contain number only
             for (String name : cellMap.keySet()) {
                 String value = cellMap.get(name).toString();  
-                System.out.println(name + " => " + value);
                 cellHandler.putCell(name, value);
     		}
-            System.out.println("---- Math Cell Map");  
+            // For normal cell which contain Math Formular content
             for (String name : mathCellMap.keySet()) {
                 String value = mathCellMap.get(name).toString();  
-                System.out.println(name + " => " + value);  
                 TikiCell mathCell = new TikiCell(name, value);
                 TikiCell evaluatedCell = cellHandler.evaluateCell(mathCell, cellMap);
                 cellHandler.putCell(name, evaluatedCell.getContent());             
