@@ -53,21 +53,7 @@ public class TikiMainApp {
 
 //        bufferedWriter.close();
         
-        System.out.println("---- Normal Cell Map");
-        // For normal cell which contain number only
-        for (String name : cellMap.keySet()) {
-            String value = cellMap.get(name).toString();  
-            System.out.println(name + " => " + value);
-            cellHandler.putCell(name, value);
-		}
-        System.out.println("---- Math Cell Map");  
-        for (String name : mathCellMap.keySet()) {
-            String value = mathCellMap.get(name).toString();  
-            System.out.println(name + " => " + value);  
-            TikiCell mathCell = new TikiCell(name, value);
-            TikiCell evaluatedCell = cellHandler.evaluateCell(mathCell, cellMap);
-            cellHandler.putCell(name, evaluatedCell.getContent());             
-		}
+        String findCircularDependencies = cellHandler.findCircularDependencies(mathCellMap);
         
         System.out.println("Output: \n");
         System.out.println("---------------------------------------");
@@ -80,6 +66,22 @@ public class TikiMainApp {
 				System.out.println(errorMsg);
 			}
         } else {
+        	System.out.println("---- Normal Cell Map");
+            // For normal cell which contain number only
+            for (String name : cellMap.keySet()) {
+                String value = cellMap.get(name).toString();  
+                System.out.println(name + " => " + value);
+                cellHandler.putCell(name, value);
+    		}
+            System.out.println("---- Math Cell Map");  
+            for (String name : mathCellMap.keySet()) {
+                String value = mathCellMap.get(name).toString();  
+                System.out.println(name + " => " + value);  
+                TikiCell mathCell = new TikiCell(name, value);
+                TikiCell evaluatedCell = cellHandler.evaluateCell(mathCell, cellMap);
+                cellHandler.putCell(name, evaluatedCell.getContent());             
+    		}
+            
         	System.out.println(cellHandler.toString());        	
         }
 

@@ -1,6 +1,7 @@
 package trinhthanhbinh;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,11 @@ public class SimpleExcelAppHandler {
 		try {
 			String mathContent = mathCell.getContent();
 			String[] tokens = generateTokens(mathContent, normalCellMap);
+			if(tokens.length == 0) {
+				System.err.println("---> " + mathCell.getName() + " NOT exited");
+				return cell;
+			}
+			
 			int realValue = evaluateRPN(tokens);
 			System.out.println("===> value: " + realValue);
 			cell = new TikiCell(mathCell.getName(), String.valueOf(realValue));			
@@ -120,12 +126,65 @@ public class SimpleExcelAppHandler {
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 		Map<String, String> finalCellMap = this.getCellMap();
+//		List<String> sortedCellByKey = new ArrayList<String>(this.getCellMap().keySet());
+//		Collections.sort(sortedCellByKey);
     	for (String name : finalCellMap.keySet()) {
     		String value = finalCellMap.get(name).toString();  
     		sb.append(name + "\n");
     		sb.append(value + "\n");
     	}
     	return sb.toString();
+	}
+	
+	/**
+	 * find Circular Dependencies
+	 * @return
+	 */
+	public String findCircularDependencies(Map<String, String> mathCellMap) {
+		String result = "";
+		boolean isCircularDependencies = false;
+		CellGraph graph = new CellGraph(mathCellMap.size());
+		
+		// Mapping each cell with unique integer value
+		final int NOT_FOUND = -1;
+		int position = 0;
+		Map<String, Integer> cellMap = new HashMap<String, Integer>();
+		for (String name : mathCellMap.keySet()) {
+			cellMap.put(name, position++);
+		}
+		
+		if(cellMap != null && cellMap.size() < 2) {
+			isCircularDependencies = false;
+		} else {
+			
+			for (String cellName : mathCellMap.keySet()) {
+				String rawContent = mathCellMap.get(cellName).toString();
+				
+				String[] splittedTexts = rawContent.split(" ");
+				for (String splittedText : splittedTexts) {
+					if(AppHelper.isContainLetter(splittedText)) {
+						Integer cellPosition = cellMap.get(splittedText);
+						Integer currCellPosition = cellMap.get(cellName);
+						
+						boolean isExistedEdge = graph.isExistedEdge(currCellPosition.intValue(), cellPosition.intValue());
+						if(isExistedEdge) {
+							isCircularDependencies = true;
+							result = DEPENDENCY_DETECT_STR + " between " + cellName + " and " + splittedText + " detected";
+						} else {
+							if(cellPosition != null && currCellPosition != null) {
+								graph.addEdge(currCellPosition.intValue(), cellPosition.intValue()); 
+							}
+						}
+			
+					}
+				}
+				
+			}
+			
+		}
+
+		if(result != null && !result.isEmpty()) this.getErrors().add(result);
+		return result;
 	}
 	
 
