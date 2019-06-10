@@ -21,7 +21,7 @@ public class TikiMainApp {
 //		BufferedWriter bufferedWriter = new BufferedWriter(new File)
 		
 		SimpleExcelAppHandler cellHandler = new SimpleExcelAppHandler();
-		List<TikiCell> cells = new ArrayList<TikiCell>();
+//		List<TikiCell> cells = new ArrayList<TikiCell>();
 		Map<String, String> cellMap = new HashMap<String, String>();
 		Map<String, String> mathCellMap = new HashMap<String, String>();
 
@@ -35,11 +35,11 @@ public class TikiMainApp {
             String str = scanner.nextLine();
 
             if(count == 0) {
-            	cell.setName(str);
+            	cell.setName(str.trim());
             	count++;
             }
             else if(count == 1) {
-            	cell.setContent(str);
+            	cell.setContent(str.trim());
             	
             	if(!AppHelper.isContainLetter(str)) 
             		cellMap.put(cell.getName(), cell.getContent());
@@ -57,18 +57,20 @@ public class TikiMainApp {
 
 //        bufferedWriter.close();
         
+        System.out.println("---- Normal Cell Map");
         // For normal cell which contain number only
         for (String name : cellMap.keySet()) {
             String value = cellMap.get(name).toString();  
             System.out.println(name + " => " + value);
             cellHandler.putCell(name, value);
 		}
-        System.out.println("----");  
+        System.out.println("---- Math Cell Map");  
         for (String name : mathCellMap.keySet()) {
             String value = mathCellMap.get(name).toString();  
             System.out.println(name + " => " + value);  
             TikiCell mathCell = new TikiCell(name, value);
             TikiCell evaluatedCell = cellHandler.evaluateCell(mathCell, cellMap);
+            cellHandler.putCell(name, evaluatedCell.getContent());             
 		}
         
         System.out.println("---------------------------------------");
@@ -77,11 +79,6 @@ public class TikiMainApp {
         scanner.close();
 	}
 	
-	// Complete the alternatingCharacters function below.
-    static TikiCell evaluateCell(String s) {
-    	TikiCell cell = new TikiCell("A1", s);
-
-    	return cell;
-    }
+	
 
 }
