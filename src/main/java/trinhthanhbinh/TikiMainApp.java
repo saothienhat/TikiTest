@@ -1,14 +1,87 @@
 package trinhthanhbinh;
 
+import java.io.*;
+import java.math.*;
+import java.security.*;
+import java.text.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.regex.*;
+
 /**
  * @author Trinh Thanh Binh (trinhbinh87@gmail.com)
  *
  */
 public class TikiMainApp {
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+	private static final Scanner scanner = new Scanner(System.in);
+	
+	public static void main(String[] args) throws IOException {
+//		BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
+//		BufferedWriter bufferedWriter = new BufferedWriter(new File)
+		
+		SimpleExcelAppHandler cellHandler = new SimpleExcelAppHandler();
+		List<TikiCell> cells = new ArrayList<TikiCell>();
+		Map<String, String> cellMap = new HashMap<String, String>();
+		Map<String, String> mathCellMap = new HashMap<String, String>();
 
+        int n = scanner.nextInt();
+        scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])?");
+        
+//        System.out.println("Input: \n");
+        int count = 0;
+        TikiCell cell = new TikiCell();
+        for (int nItr = 0; nItr < 2*n; nItr++) {
+            String str = scanner.nextLine();
+
+            if(count == 0) {
+            	cell.setName(str);
+            	count++;
+            }
+            else if(count == 1) {
+            	cell.setContent(str);
+            	
+            	if(!AppHelper.isContainLetter(str)) 
+            		cellMap.put(cell.getName(), cell.getContent());
+            	else 
+            		mathCellMap.put(cell.getName(), cell.getContent());
+            	
+            	count = 0;
+            	cell = new TikiCell();
+            }
+            
+
+//            bufferedWriter.write(String.valueOf(result));
+//            bufferedWriter.newLine();
+        }
+
+//        bufferedWriter.close();
+        
+        // For normal cell which contain number only
+        for (String name : cellMap.keySet()) {
+            String value = cellMap.get(name).toString();  
+            System.out.println(name + " => " + value);
+            cellHandler.putCell(name, value);
+		}
+        System.out.println("----");  
+        for (String name : mathCellMap.keySet()) {
+            String value = mathCellMap.get(name).toString();  
+            System.out.println(name + " => " + value);  
+            TikiCell mathCell = new TikiCell(name, value);
+            TikiCell evaluatedCell = cellHandler.evaluateCell(mathCell, cellMap);
+		}
+        
+        System.out.println("---------------------------------------");
+        System.out.println("Output: \n");
+
+        scanner.close();
 	}
+	
+	// Complete the alternatingCharacters function below.
+    static TikiCell evaluateCell(String s) {
+    	TikiCell cell = new TikiCell("A1", s);
+
+    	return cell;
+    }
 
 }
