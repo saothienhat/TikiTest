@@ -15,9 +15,6 @@ public class TikiMainApp {
 	private static final Scanner scanner = new Scanner(System.in);
 	
 	public static void main(String[] args) throws IOException {
-//		BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
-//		BufferedWriter bufferedWriter = new BufferedWriter(new File)
-		
 		SimpleExcelAppHandler cellHandler = new SimpleExcelAppHandler();
 		Map<String, String> cellMap = new HashMap<String, String>();
 		Map<String, String> mathCellMap = new HashMap<String, String>();
@@ -45,25 +42,20 @@ public class TikiMainApp {
             	count = 0;
             	cell = new TikiCell();
             }
-            
 
-//            bufferedWriter.write(String.valueOf(result));
-//            bufferedWriter.newLine();
         }
 
-//        bufferedWriter.close();
         
-//        String findCircularDependencies = cellHandler.findCircularDependencies(mathCellMap);
         /*
-         * Pre process cells to detect errors
+         * Pre-process cells to detect errors
          */
         cellHandler.preProcess(mathCellMap);
         
-        System.out.println("Output: \n");
-        System.out.println("---------------------------------------");
         /**
          * Print the result
          */
+        System.out.println("\nOutput: ");
+        System.out.println("---------------------------------------");
         List<String> cellHanldErrors = cellHandler.getErrors();
         if(cellHanldErrors != null && cellHanldErrors.size() > 0) {
         	for (String errorMsg : cellHanldErrors) {
