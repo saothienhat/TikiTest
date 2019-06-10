@@ -1,12 +1,10 @@
 package trinhthanhbinh;
 
-import java.io.*;
-import java.math.*;
-import java.security.*;
-import java.text.*;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.regex.*;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
 /**
  * @author Trinh Thanh Binh (trinhbinh87@gmail.com)
@@ -21,14 +19,12 @@ public class TikiMainApp {
 //		BufferedWriter bufferedWriter = new BufferedWriter(new File)
 		
 		SimpleExcelAppHandler cellHandler = new SimpleExcelAppHandler();
-//		List<TikiCell> cells = new ArrayList<TikiCell>();
 		Map<String, String> cellMap = new HashMap<String, String>();
 		Map<String, String> mathCellMap = new HashMap<String, String>();
 
         int n = scanner.nextInt();
         scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])?");
-        
-//        System.out.println("Input: \n");
+
         int count = 0;
         TikiCell cell = new TikiCell();
         for (int nItr = 0; nItr < 2*n; nItr++) {
@@ -73,8 +69,19 @@ public class TikiMainApp {
             cellHandler.putCell(name, evaluatedCell.getContent());             
 		}
         
-        System.out.println("---------------------------------------");
         System.out.println("Output: \n");
+        System.out.println("---------------------------------------");
+        /**
+         * Print the result
+         */
+        List<String> cellHanldErrors = cellHandler.getErrors();
+        if(cellHanldErrors != null && cellHanldErrors.size() > 0) {
+        	for (String errorMsg : cellHanldErrors) {
+				System.out.println(errorMsg);
+			}
+        } else {
+        	System.out.println(cellHandler.toString());        	
+        }
 
         scanner.close();
 	}

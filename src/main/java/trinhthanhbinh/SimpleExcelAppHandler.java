@@ -12,6 +12,7 @@ import java.util.Stack;
  */
 public class SimpleExcelAppHandler {
 	private final String DEPENDENCY_DETECT_STR = "Circular dependency";
+	private List<String> errors;
 	private Map<String, String> cellMap;
 
 	public Map<String, String> getCellMap() {
@@ -28,6 +29,7 @@ public class SimpleExcelAppHandler {
 
 	public SimpleExcelAppHandler() {
 		this.cellMap = new HashMap<String, String>();
+		this.errors = new ArrayList<String>();
 	}
 
 	/**
@@ -36,11 +38,17 @@ public class SimpleExcelAppHandler {
 	 * @return an evaluated cell
 	 */
 	public TikiCell evaluateCell(TikiCell mathCell, Map<String, String> normalCellMap) {
-		String mathContent = mathCell.getContent();
-		String[] tokens = generateTokens(mathContent, normalCellMap);
-		int realValue = evaluateRPN(tokens);
-		System.out.println("===> value: " + realValue);
-		return new TikiCell(mathCell.getName(), String.valueOf(realValue));
+		TikiCell cell = new TikiCell();
+		try {
+			String mathContent = mathCell.getContent();
+			String[] tokens = generateTokens(mathContent, normalCellMap);
+			int realValue = evaluateRPN(tokens);
+			System.out.println("===> value: " + realValue);
+			cell = new TikiCell(mathCell.getName(), String.valueOf(realValue));			
+		} catch (ArithmeticException e) {
+			this.getErrors().add("ArithmeticException: / by zero");
+		}
+		return cell;
 	}
 	
 	
@@ -67,7 +75,7 @@ public class SimpleExcelAppHandler {
 	 * @param tokens such as ["2", "1", "+", "3", "*"]
 	 * @return
 	 */
-	private int evaluateRPN(String[] tokens) {
+	private int evaluateRPN(String[] tokens) throws ArithmeticException {
 		int returnValue = 0;
 		String operators = "+-*/";
 		Stack<String> stack = new Stack<String>();
@@ -99,7 +107,26 @@ public class SimpleExcelAppHandler {
 		returnValue = Integer.valueOf(stack.pop());
 		return returnValue;
 	}
+
+	public List<String> getErrors() {
+		return errors;
+	}
+
+	public void setErrors(List<String> errors) {
+		this.errors = errors;
+	}
 	
+	@Override
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		Map<String, String> finalCellMap = this.getCellMap();
+    	for (String name : finalCellMap.keySet()) {
+    		String value = finalCellMap.get(name).toString();  
+    		sb.append(name + "\n");
+    		sb.append(value + "\n");
+    	}
+    	return sb.toString();
+	}
 	
 
 }
